@@ -60,7 +60,6 @@ AddEventHandler("bcc-posse:leaveposse", function(posseid)
 	local _source = source
 	local player = VORPcore.getUser(_source).getUsedCharacter
 	local steamid = player.identifier
-	local name = player.firstname .. " " .. player.lastname
 	local charid = player.charIdentifier
 	exports.ghmattimysql:execute("SELECT id FROM `posse` WHERE characterid = @characterid",
 		{ ["@characterid"] = charid },
@@ -151,7 +150,6 @@ AddEventHandler("bcc-posse:createposse", function(possename)
 	local player = VORPcore.getUser(_source).getUsedCharacter
 	local steamid = player.identifier
 	local charid = player.charIdentifier
-	local name = player.firstname .. " " .. player.lastname
 	exports.ghmattimysql:execute("SELECT id FROM `posse` WHERE characterid = @characterid",
 		{ ["@characterid"] = charid },
 		function(result)
@@ -180,7 +178,6 @@ RegisterServerEvent('bcc-posse:posselist')
 AddEventHandler('bcc-posse:posselist', function()
 	local _source = source
 	local player = VORPcore.getUser(_source).getUsedCharacter
-	local charid = player.charIdentifier
 
 	exports.ghmattimysql:execute(
 		'SELECT * FROM characters WHERE posseid=@posseid',
