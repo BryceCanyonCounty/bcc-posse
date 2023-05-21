@@ -8,17 +8,8 @@ The bcc-posse RedM script offers exciting functionalities to create and manage p
 4. Add ensure `bcc-posse` to your server.cfg file to start the script on server startup.
 Usage
 
-
 ## Posse Formation
-To form a posse, players can use the in-game command /formposse. This command will allow them to create a new posse and become the posse leader.
-
-## Member Management
-As the posse leader, you have access to various member management commands. These commands include:
-
-- /invite [playerID]: Send an invitation to a player to join your posse.
-- /kick [playerID]: Remove a member from your posse.
-- /promote [playerID]: Promote a member to the posse officer rank.
-- /demote [playerID]: Demote a posse officer to a regular member.
+To form a posse, players can use the in-game command /posse. This command will allow them to create a new posse and become the posse leader.
 
 ## Posse Area Check
 To check if any individuals within a specific area are part of your posse, you can utilize the following export function:
