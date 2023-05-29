@@ -21,7 +21,7 @@ RegisterNetEvent('bcc-posse:sendinfo')
 AddEventHandler('bcc-posse:sendinfo', function(posseid, inposse, radius)
 	local closestPlayer, closestDistance = GetClosestPlayer()
 	local targetid = GetPlayerServerId(closestPlayer)
-	local id = posseid
+	possenumber = posseid
 	if not inposse then
 		inposse = false
 	else
@@ -29,9 +29,10 @@ AddEventHandler('bcc-posse:sendinfo', function(posseid, inposse, radius)
 		if closestPlayer ~= -1 and closestDistance <= radius then
 			TriggerServerEvent('bcc-posse:checkposse', tonumber(targetid), id)
 		end
-		local id = GetPlayerServerId(GetPlayerIndex())
-		table.insert(Possetable, id)
+		--local id = GetPlayerServerId(GetPlayerIndex())
+		--table.insert(Possetable, id)
 	end
+	print(possenumber)
 end)
 
 function CheckPosseArea(coords, radius)
@@ -80,6 +81,8 @@ TriggerEvent("menuapi:getData", function(call)
 	MenuData = call
 end)
 function PosseMenu() -- Base Menu Logic
+	TriggerServerEvent('bcc-posse:grabinfo')
+
 	MenuData.CloseAll()
 	local elements = {}
 
@@ -107,12 +110,10 @@ function PosseMenu() -- Base Menu Logic
 				CreatePosseMenu()
 			end
 			if (data.current.value == 'view') then
-				TriggerServerEvent('bcc-posse:grabinfo')
-				Wait(100)
-				TriggerServerEvent('bcc-posse:posselist')
+				Wait(250)
+				TriggerServerEvent('bcc-posse:posselist', possenumber)
 			end
 			if (data.current.value == 'leave') then
-				TriggerServerEvent('bcc-posse:grabinfo')
 				Wait(100)
 				TriggerServerEvent('bcc-posse:leaveposse')
 				menu.close()
@@ -214,15 +215,16 @@ function ViewPosseInvites() -- ViewInvite Logic
 		end)
 end
 
-function ViewMembersMenu() -- View Member Logic
+RegisterNetEvent('bcc-posse:ViewMembersMenu', function(result)
+	-- View Member Logic
 	MenuData.CloseAll()
-	local elements = {}
-
-	for key, v in pairs(posselist) do
-		elements[#elements + 1] = {
+	local elements, elementindex = {}, 1
+	for key, v in pairs(result) do
+		elements[elementindex] = {
 			label = v.firstname .. " " .. v.lastname,
 			value = "players"
 		}
+		elementindex = elementindex + 1
 	end
 
 	MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
@@ -240,7 +242,7 @@ function ViewMembersMenu() -- View Member Logic
 		function(data, menu)
 			menu.close()
 		end)
-end
+end)
 
 function GetClosestPlayer()
 	local players, closestDistance, closestPlayer = GetActivePlayers(), -1, -1
