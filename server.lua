@@ -16,20 +16,18 @@ AddEventHandler("bcc-posse:grabinfo", function(id, radius)
 	Wait(100)
 	local player = VORPcore.getUser(_source).getUsedCharacter
 	local charid = player.charIdentifier
-	exports.ghmattimysql:execute("SELECT posseid FROM `characters` WHERE charidentifier = @characterid",
-		{ ["@characterid"] = charid },
-		function(result)
-			if result[1] ~= 0 then
-				posseid = result[1].posseid
-			else
-				TriggerClientEvent("vorp:TipBottom", _source, "not in posse", 3000)
-			end
-			local inposse = false
-			if posseid ~= 0 then
-				inposse = true
-			end
-			TriggerClientEvent('bcc-posse:sendinfo', _source, posseid, inposse, radius)
-		end)
+	local result = MySQL.query.await("SELECT posseid FROM characters WHERE charidentifier=@characterid",
+		{ ["characterid"] = charid })
+	if result ~= 0 then
+		posseid = result[1].posseid
+	else
+		TriggerClientEvent("vorp:TipBottom", _source, "not in posse", 3000)
+	end
+	local inposse = false
+	if posseid ~= 0 then
+		inposse = true
+	end
+	TriggerClientEvent('bcc-posse:sendinfo', _source, posseid, inposse, radius)
 end)
 
 RegisterServerEvent("bcc-posse:checkposse")
@@ -174,20 +172,14 @@ AddEventHandler("bcc-posse:createposse", function(possename)
 		end)
 end)
 
-RegisterServerEvent('bcc-posse:posselist')
-AddEventHandler('bcc-posse:posselist', function()
+RegisterServerEvent("bcc-posse:posselist")
+AddEventHandler("bcc-posse:posselist", function(posseid)
+	print('testing')
 	local _source = source
-	local player = VORPcore.getUser(_source).getUsedCharacter
-
-	exports.ghmattimysql:execute(
-		'SELECT * FROM characters WHERE posseid=@posseid',
-		{ ['posseid'] = posseid }, function(result)
-			if result[1] ~= 0 then
-				if posseid ~= 0 then
-					TriggerClientEvent('bcc-posse:sendposselist', _source, result)
-				else
-					TriggerClientEvent("vorp:TipBottom", _source, "You are not in a posse currently ", 3000)
-				end
-			end
+	exports.ghmattimysql:execute("SELECT firstname, lastname, charidentifier FROM characters WHERE posseid = @posseid",
+		{ ["posseid"] = posseid },
+		function(result)
+			print(json.encode(result))
+			TriggerClientEvent('bcc-posse:ViewMembersMenu', _source, result)
 		end)
 end)
