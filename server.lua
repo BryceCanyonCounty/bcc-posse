@@ -174,12 +174,11 @@ end)
 
 RegisterServerEvent("bcc-posse:posselist")
 AddEventHandler("bcc-posse:posselist", function(posseid)
-	print('testing')
+	
 	local _source = source
 	exports.ghmattimysql:execute("SELECT firstname, lastname, charidentifier FROM characters WHERE posseid = @posseid",
 		{ ["posseid"] = posseid },
 		function(result)
-			print(json.encode(result))
 			TriggerClientEvent('bcc-posse:ViewMembersMenu', _source, result)
 		end)
 end)
