@@ -6,6 +6,7 @@ local playid
 local isinvited = false
 local invitedpossename
 local possename = " "
+local InviteDistance = 50.0 --Change this to the distance players must be with in to be invited and accept invites
 
 TriggerEvent("getCore", function(core)
 	VORPcore = core
@@ -81,7 +82,7 @@ TriggerEvent("menuapi:getData", function(call)
 	MenuData = call
 end)
 function PosseMenu() -- Base Menu Logic
-	TriggerServerEvent('bcc-posse:grabinfo')
+	TriggerServerEvent('bcc-posse:grabinfo',source,InviteDistance)
 
 	MenuData.CloseAll()
 	local elements = {}
