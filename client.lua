@@ -6,7 +6,6 @@ local playid
 local isinvited = false
 local invitedpossename
 local possename = " "
-local InviteDistance = 50.0 --Change this to the distance players must be with in to be invited and accept invites
 
 TriggerEvent("getCore", function(core)
 	VORPcore = core
@@ -28,7 +27,7 @@ AddEventHandler('bcc-posse:sendinfo', function(posseid, inposse, radius)
 	else
 		inposse = true
 		if closestPlayer ~= -1 and closestDistance <= radius then
-			TriggerServerEvent('bcc-posse:checkposse', tonumber(targetid), id)
+			TriggerServerEvent('bcc-posse:checkposse', tonumber(targetid), possenumber)
 		end
 		--local id = GetPlayerServerId(GetPlayerIndex())
 		--table.insert(Possetable, id)
@@ -74,7 +73,10 @@ RegisterNetEvent('bcc-posse:sendposseinvites')
 AddEventHandler('bcc-posse:sendposseinvites', function(posseid, posseinvites, invite)
 	isinvited = invite
 	invitedpossename = posseinvites
-	possenumber = posseid
+	invitenumber = posseid
+	possenumber = invitenumber
+	print(possenumber)
+
 end)
 
 MenuData = {}
@@ -82,7 +84,7 @@ TriggerEvent("menuapi:getData", function(call)
 	MenuData = call
 end)
 function PosseMenu() -- Base Menu Logic
-	TriggerServerEvent('bcc-posse:grabinfo',source,InviteDistance)
+	TriggerServerEvent('bcc-posse:grabinfo',source,Config.InviteDistance)
 
 	MenuData.CloseAll()
 	local elements = {}
@@ -130,7 +132,7 @@ function PosseMenu() -- Base Menu Logic
 			end
 
 			if (data.current.value == 'viewinvites') then
-				Wait(100)
+				Wait(250)
 				ViewPosseInvites()
 			end
 		end,
@@ -184,7 +186,7 @@ end
 function ViewPosseInvites() -- ViewInvite Logic
 	MenuData.CloseAll()
 	local elements = {
-		{ label = possenumber .. " : " .. invitedpossename, value = 'posse' },
+		{ label = invitenumber .. " : " .. invitedpossename, value = 'posse' },
 		{ label = "Accept",                                 value = 'accept' },
 		{ label = "Deny",                                   value = 'deny' },
 
@@ -203,7 +205,7 @@ function ViewPosseInvites() -- ViewInvite Logic
 				_G[data.trigger]()
 			end
 			if data.current.value == "accept" then
-				TriggerServerEvent('bcc-posse:acceptinvite', possenumber)
+				TriggerServerEvent('bcc-posse:acceptinvite', invitenumber)
 				isinvited = false
 				menu.close()
 			end

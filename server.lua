@@ -6,6 +6,7 @@ end)
 
 local posseid
 local possename
+local number
 
 RegisterServerEvent("bcc-posse:grabinfo")
 AddEventHandler("bcc-posse:grabinfo", function(id, radius)
@@ -45,9 +46,6 @@ AddEventHandler("bcc-posse:checkposse", function(targetid, id)
 			if result[1].posseid == id then
 				id = result[1].posseid
 				TriggerClientEvent('bcc-posse:possefound', _source)
-				TriggerClientEvent("vorp:NotifyLeft", _source, 'Posse Invite', 'You are in the same posse',
-					'inventory_items',
-					'folder_invitations', 5000)
 			end
 		end)
 end)
@@ -100,23 +98,24 @@ AddEventHandler("bcc-posse:beeninvitedsv", function(targetid)
 		{ ["@targetid"] = tarid },
 		function(result)
 			posseid = result[1].posseid
-		end)
 
 	exports.ghmattimysql:execute("SELECT * FROM `posse` WHERE characterid = @characterid",
 		{ ["@characterid"] = charid },
 		function(result)
 			possename = result[1].possename
 			number = result[1].id
+			Wait(100)
+			if posseid == 0 then
+				TriggerClientEvent('bcc-posse:sendposseinvites', targetid, number, possename, true)
+				TriggerClientEvent("vorp:NotifyLeft", targetid, 'Posse Invite', 'You have been invited to a posse',
+					'inventory_items',
+					'folder_invitations', 5000)
+			else
+				TriggerClientEvent("vorp:TipBottom", targetid, "already in posse", 3000)
+			end
 		end)
-	Wait(100)
-	if posseid == 0 then
-		TriggerClientEvent('bcc-posse:sendposseinvites', targetid, number, possename, true)
-		TriggerClientEvent("vorp:NotifyLeft", targetid, 'Posse Invite', 'You have been invited to a posse',
-			'inventory_items',
-			'folder_invitations', 5000)
-	else
-		TriggerClientEvent("vorp:TipBottom", targetid, "already in posse", 3000)
-	end
+	end)
+
 end)
 
 RegisterServerEvent("bcc-posse:acceptinvite")
@@ -173,12 +172,16 @@ AddEventHandler("bcc-posse:createposse", function(possename)
 end)
 
 RegisterServerEvent("bcc-posse:posselist")
-AddEventHandler("bcc-posse:posselist", function(posseid)
-	
+AddEventHandler("bcc-posse:posselist", function(possenumber)
+	print(possenumber)
 	local _source = source
-	exports.ghmattimysql:execute("SELECT firstname, lastname, charidentifier FROM characters WHERE posseid = @posseid",
-		{ ["posseid"] = posseid },
-		function(result)
-			TriggerClientEvent('bcc-posse:ViewMembersMenu', _source, result)
-		end)
+
+	if possenumber > 0 then
+		exports.ghmattimysql:execute(
+			"SELECT firstname, lastname, charidentifier FROM characters WHERE posseid = @posseid",
+			{ ["posseid"] = possenumber },
+			function(result)
+				TriggerClientEvent('bcc-posse:ViewMembersMenu', _source, result)
+			end)
+	end
 end)
